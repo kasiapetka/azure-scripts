@@ -1,9 +1,9 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
 const fs = require('fs');
 
-const connStr = "DefaultEndpointsProtocol=https;AccountName=testeastusconnection;AccountKey=96ZsP8pbSobSLeoOZeEHrdz2U+w3oQ/l2I0R3/elSxuAnyFf/uWtX8YmHeI27CF8W9E1nklsGSdVs9viO9anNA==;EndpointSuffix=core.windows.net"
+const connStr = ""
 const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-const containerName = "snap-1624902165112-sys-master-images";
+const containerName = "";
 
 function monthToString(month){
     switch (month){

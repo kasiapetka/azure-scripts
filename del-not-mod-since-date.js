@@ -2,25 +2,31 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const fs = require('fs');
 
 //TODO INSERT CONNECTIONN STRING
-const connStr = "connectionSting"
+const connStr = ""
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
 
 //TODO INSERT CONTAINER NAME
-const containerName = "containerName";
+const containerName = "";
 
 async function main() {
 
-    //TODO SET THE MONTH NUMBER (0-January, 1-February, 3-March, ..., 11-November, 12-December)
-    let month = 0;
-
     let deletedFiles=0;
     const containerClient = blobServiceClient.getContainerClient(containerName); 
-    let blobs = containerClient.listBlobsFlat({includeDeleted: true});
+    let blobs = containerClient.listBlobsFlat();
     for await (const blob of blobs) {
-        if(blob.properties.lastModified.getMonth().valueOf() === month){
-            containerClient.deleteBlob(blob.name);
-            deletedFiles++;
+
+        //THIS WILL WORK ONLY IF YOU HAVE A STRUCTURE LIKE: ContainerName/FolderName/FolderName/archive
+        if(blob.name.split('/')[2] && blob.name.split('/')[2]==='archive'){
+
+            //CHANGE THE DATE, EVERY FILE THAT WAS NOT MODIFIED SINCE PROVIDED DATE WILL BE DELETED
+            let now = new Date('2022-01-01');
+            
+            if(now>blob.properties.lastModified){
+                console.log(blob.properties.lastModified);
+                containerClient.deleteBlob(blob.name);
+                deletedFiles++;
+            }
         }
     }
     
@@ -32,7 +38,7 @@ async function main() {
         }
         console.log("The file was saved!");
     }); 
-  }
+  }codate
   
 
 main();

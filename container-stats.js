@@ -2,7 +2,7 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const fs = require('fs');
 
 //connect to the storage account via connection string
-const connStr = "DefaultEndpointsProtocol=https;AccountName=v3c2pqtm70gany6oyh6a53u;AccountKey=a8AIC8JRVitQ7iyYwK9MoyHT3YzkHSW0b3pijKAnrr/dHq/9NhkWsyzRMhPTmz/yR/+Kgz6Oyvo/LiQWEmBzlQ==;EndpointSuffix=core.windows.net";
+const connStr = "";
 const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
 
 //helper function that formats bytes 
@@ -34,7 +34,9 @@ async function main() {
         }
 
         //write the result to an object
-        containers[container.name] =  formatBytes(size);   
+        containers[container.name] =  formatBytes(size); 
+        console.log(containers);
+  
     }
 
     //convert object with results to JSON format
