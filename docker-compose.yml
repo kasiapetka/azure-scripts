@@ -3,11 +3,10 @@ services:
   script:
     image: kasiapetka/scriptazure
     environment:
-      - D=28
-      - M=3
+      - D=10
+      - M=10
       - Y=2022
       - CONNECTION_STRING=connectionstring
       - CONTAINER_NAME=containername
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./:/app/logs

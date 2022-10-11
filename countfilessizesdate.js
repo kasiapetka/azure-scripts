@@ -1,6 +1,6 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
 const fs = require("fs");
-require('dotenv').config() 
+require("dotenv").config();
 
 //helper function that formats bytes
 function formatBytes(bytes, decimals = 2) {
@@ -18,8 +18,7 @@ function formatBytes(bytes, decimals = 2) {
 async function main() {
   var argv = require("minimist")(process.argv.slice(2));
   try {
-
-    if (!argv.D || !argv.M || !argv.Y ) {
+    if (!argv.D || !argv.M || !argv.Y) {
       throw "Please provide all arguments:\n -D for day, \n -M for month, \n -Y for year";
     }
     if (
@@ -50,16 +49,31 @@ async function main() {
     return;
   }
 
-  console.log(`Provided date is ${argv.D}-${argv.M}-${argv.Y}, Connection string is ${process.env.CONNECTION_STRING}`);
+  console.log(
+    `Provided date is ${argv.D}-${argv.M}-${argv.Y}, Connection string is ${process.env.CONNECTION_STRING}`
+  );
 
-  const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING.toString());
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING.toString()
+  );
 
-  const containerClient = blobServiceClient.getContainerClient(process.env.CONTAINER_NAME.toString());
+  const containerClient = blobServiceClient.getContainerClient(
+    process.env.CONTAINER_NAME.toString()
+  );
 
   let blobs = containerClient.listBlobsFlat();
 
   let count = 0;
   let size = 0;
+
+  fs.promises.mkdir('/logs').catch(console.error);
+
+  fs.writeFile("logs/results.txt", "Starting going through the blobs... \n", function (err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
+
   console.log("Starting going through the blobs...");
 
   for await (const blob of blobs) {
@@ -71,13 +85,16 @@ async function main() {
     ) {
       count++;
       size = blob.properties.contentLength.valueOf() + size;
-      console.log(
-        `One file from ${argv.D}-${argv.M}-${
-          argv.Y
-        } added, with size ${formatBytes(
-          blob.properties.contentLength.valueOf()
-        )}.`
-      );
+      let log = `One file from ${argv.D}-${argv.M}-${argv.Y} added, with name ${
+        blob.name
+      } and with size ${formatBytes(blob.properties.contentLength.valueOf())}. \n`;
+      console.log(log);
+
+      fs.appendFile("logs/results.txt", log, function (err) {
+        if (err) {
+          return console.log(err);
+        }
+      });
     }
   }
   let string = `Results from date ${argv.D}-${argv.M}-${
@@ -85,7 +102,7 @@ async function main() {
   } are ${count} files. Their added size is ${formatBytes(size)}.`;
 
   console.log(string);
-  fs.writeFile("results", string, function (err) {
+  fs.appendFile("logs/results.txt", string, function (err) {
     if (err) {
       return console.log(err);
     }
