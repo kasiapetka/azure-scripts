@@ -12,4 +12,4 @@ ENV M=1
 ENV Y=2022
 
 
-ENTRYPOINT node countfilessizesdate.js -D $D -M $M -Y $Y -CS $CS -CN $CN
+ENTRYPOINT node countfilessizesdate.js -D $D -M $M -Y $Y 
