@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  script:
+    image: kasiapetka/scriptazure
+    environment:
+      - D=28
+      - M=3
+      - Y=2022
+      - CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=pskcwvb8hporbxutu6v9zil;AccountKey=Eb7us1A7MM5ko8A8kVcsfw/RIFNRyFMcKXhf+4gnECd5+2HDWkt6NNJzNP/GtaQ0ziqGk7NMkMymWdylt98trA==;EndpointSuffix=core.windows.net
+      - CONTAINER_NAME=commerce-logging
+    volumes:
+      - ./:/app
+      - /app/node_modules
