@@ -1,6 +1,8 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
 const fs = require("fs");
 require("dotenv").config();
+const validateDate = require("validate-date");
+const path = require('path');
 
 //helper function that formats bytes
 function formatBytes(bytes, decimals = 2) {
@@ -15,34 +17,21 @@ function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
+function checkDate(day, month,year){
+  if(day<10){
+    day='0'+day.toString();
+  }
+  return validateDate(`${day}/${month}/${year}`, responseType="boolean", dateFormat="dd/mm/yyyy"); // returns "Valid Date"
+}
+
 async function main() {
   var argv = require("minimist")(process.argv.slice(2));
   try {
     if (!argv.D || !argv.M || !argv.Y) {
       throw "Please provide all arguments:\n -D for day, \n -M for month, \n -Y for year";
     }
-    if (
-      argv.Y >= 1990 &&
-      argv.Y <= new Date().getFullYear() &&
-      argv.M >= 1 &&
-      argv.M <= 12 &&
-      argv.D >= 1 &&
-      argv.D <= 31
-    ) {
-    } else {
-      throw `Please provide all arguments in ranges:\n -D for day (1-31), \n -M for month (1-12), \n -Y for year (1990-${new Date().getFullYear()}).`;
-    }
-
-    if (argv.M === 2 && argv.Y % 4 === 0 && argv.D > 29) {
-      throw `This month has only 29 days!`;
-    }
-
-    if (argv.M === 2 && argv.Y % 4 !== 0 && argv.D > 28) {
-      throw `This month has only 28 days!`;
-    }
-
-    if (argv.M % 2 === 0 && argv.D > 30) {
-      throw `This month has only 30 days!`;
+    if (!checkDate(argv.D,argv.M,argv.Y)) {
+      throw `Please provide a valid date. ${argv.D}/${argv.M}/${argv.Y} is invalid`;
     }
   } catch (err) {
     console.log(err);
@@ -66,13 +55,13 @@ async function main() {
   let count = 0;
   let size = 0;
 
-  fs.promises.mkdir('/logs').catch(console.error);
+  try {
+    await fs.promises.mkdir(path.join(__dirname, 'logs'));
+    await fs.promises.writeFile("logs/results.txt", "Starting going through the blobs... \n");
 
-  fs.writeFile("logs/results.txt", "Starting going through the blobs... \n", function (err) {
-    if (err) {
-      return console.log(err);
-    }
-  });
+  } catch (err) {
+    console.error('Error occurred', err);
+  }
 
   console.log("Starting going through the blobs...");
 
@@ -90,11 +79,13 @@ async function main() {
       } and with size ${formatBytes(blob.properties.contentLength.valueOf())}. \n`;
       console.log(log);
 
-      fs.appendFile("logs/results.txt", log, function (err) {
-        if (err) {
-          return console.log(err);
-        }
-      });
+
+      try {
+        await fs.promises.appendFile("logs/results.txt", log)
+      } catch (err) {
+        console.error('Error occurred', err);
+      }
+  
     }
   }
   let string = `Results from date ${argv.D}-${argv.M}-${
@@ -102,12 +93,12 @@ async function main() {
   } are ${count} files. Their added size is ${formatBytes(size)}.`;
 
   console.log(string);
-  fs.appendFile("logs/results.txt", string, function (err) {
-    if (err) {
-      return console.log(err);
-    }
-    console.log("The file was saved!");
-  });
+
+  try {
+    await fs.promises.appendFile("logs/results.txt", string)
+  } catch (err) {
+    console.error('Error occurred', err);
+  }
 }
 
 main();

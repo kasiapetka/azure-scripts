@@ -12,6 +12,7 @@
     "dependencies": {
         "@azure/storage-blob": "^12.11.0",
         "dotenv": "^16.0.3",
-        "minimist": "^1.2.7"
+        "minimist": "^1.2.7",
+        "validate-date": "^2.0.0"
     }
 }
